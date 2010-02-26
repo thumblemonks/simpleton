@@ -113,4 +113,10 @@ context %Q[When the hosts are ["app1", "app2", "app3"],] do
       middleware_instances_object_ids.sort.uniq == middleware_instances_object_ids.sort
     end
   end
+
+  context %Q[Simpleton.use(middleware, :only => ["not_configured"])] do
+    asserts("that it") do
+      Simpleton.use(@middleware_class, :only => ["not_configured"])
+    end.raises(ArgumentError, /some.*are not configured/i)
+  end
 end
