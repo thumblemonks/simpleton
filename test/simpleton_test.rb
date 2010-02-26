@@ -45,9 +45,9 @@ end
   end
 end
 
-context %Q[When the hosts are ["app1", "app2", "db1"],] do
+context %Q[When the hosts are ["app1", "app2", "app3"],] do
   setup do
-    Simpleton.configure { |config| config[:hosts] = ["app1", "app2", "db1"] }
+    Simpleton.configure { |config| config[:hosts] = ["app1", "app2", "app3"] }
   end
 
   context "Simpleton.use(middleware)" do
