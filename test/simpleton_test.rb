@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'simpleton'
-require 'set'
 
 context "Simpleton" do
   setup { Simpleton }
