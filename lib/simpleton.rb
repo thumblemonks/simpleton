@@ -1,4 +1,4 @@
-class Simpleton
+module Simpleton
   Configuration = {}
   MiddlewareChains = Hash.new { |hash, key| hash[key] = []; hash[key] }
 
