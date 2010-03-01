@@ -6,31 +6,21 @@ context "Simpleton" do
   asserts_topic.responds_to :configure
   asserts_topic.responds_to :use
 
-  asserts("that Simpleton::Configuration") do
-    Simpleton::Configuration
-  end.kind_of(Hash)
-
-  asserts("that Simpleton::MiddlewareChains") do
-    Simpleton::MiddlewareChains
-  end.kind_of(Hash)
-  
-  asserts("that Simpleton::MiddlewareChains's default value") do
-    Simpleton::MiddlewareChains[Time.now]
-  end.equals([])
+  asserts("that Simpleton::Configuration") { Simpleton::Configuration }.kind_of(Hash)
+  asserts("that Simpleton::MiddlewareChains") { Simpleton::MiddlewareChains }.kind_of(Hash)
+  asserts("that Simpleton::MiddlewareChains's default value") { Simpleton::MiddlewareChains[Time.now] }.equals([])
 end
 
 context "Simpleton.configure" do
   context "with a block with single argument" do
+    desired_configuration = { :foo => "bar", :hello => "world" }
     setup do
-      @desired_configuration = { :foo => "bar", :hello => "world" }
-      Simpleton.configure  do |config|
-        config.merge!(@desired_configuration)
-      end
+      Simpleton.configure { |config| config.merge!(desired_configuration) }
     end
 
     should("set Simpleton::Configuration appropriately") do
-      @desired_configuration == Simpleton::Configuration
-    end
+      Simpleton::Configuration
+    end.equals(desired_configuration)
   end
 end
 
