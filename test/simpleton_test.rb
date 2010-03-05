@@ -51,7 +51,7 @@ context %Q[When the hosts are ["app1", "app2", "app3"],] do
 
   context "Simpleton.use(middleware)" do
     setup do
-      @middleware = Proc.new {}
+      @middleware = Proc.new {""}
       Simpleton.use @middleware
     end
 
@@ -112,7 +112,7 @@ end
 context "Simpleton.run" do
   setup do
     Simpleton.configure { |config| config[:hosts] = ["app1", "app2", "app3"] }
-    Simpleton.use Proc.new {}
+    Simpleton.use Proc.new {""}
   end
 
   should "fork a new process for each configured host" do
