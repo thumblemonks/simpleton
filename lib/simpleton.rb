@@ -18,6 +18,8 @@ module Simpleton
     applicable_hosts.each { |host| MiddlewareChains[host] << middleware_class.new }
   end
 
+  autoload :CommandRunners, "simpleton/command_runners"
+  autoload :Worker, "simpleton/worker"
 private
   def self.configured_hosts
     Array(Configuration[:hosts])

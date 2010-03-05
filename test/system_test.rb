@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'simpleton/command_runners/system'
 
 host = "host#{Time.now.to_i}"
 command = "echo 'Hello World'"

@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'simpleton/worker'
 
 context "A Simpleton::Worker" do
   host = "foo"
