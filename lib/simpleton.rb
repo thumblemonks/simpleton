@@ -1,6 +1,6 @@
 module Simpleton
   Configuration = {}
-  MiddlewareChains = Hash.new { |hash, key| hash[key] = []; hash[key] }
+  MiddlewareChains = {}
 
   def self.configure
     yield Configuration
@@ -15,11 +15,15 @@ module Simpleton
     applicable_hosts = specified_hosts || configured_hosts
     raise ArgumentError, "This middleware would not apply to any configured hosts" if applicable_hosts.empty?
 
-    applicable_hosts.each { |host| MiddlewareChains[host] << middleware_class.new }
+    applicable_hosts.each do |host|
+      MiddlewareChains[host] ||= []
+      MiddlewareChains[host] << middleware_class.new
+    end
   end
 
   autoload :CommandRunners, "simpleton/command_runners"
   autoload :Worker, "simpleton/worker"
+
 private
   def self.configured_hosts
     Array(Configuration[:hosts])

@@ -7,7 +7,9 @@ context "Simpleton" do
 
   asserts("that Simpleton::Configuration") { Simpleton::Configuration }.kind_of(Hash)
   asserts("that Simpleton::MiddlewareChains") { Simpleton::MiddlewareChains }.kind_of(Hash)
-  asserts("that Simpleton::MiddlewareChains's default value") { Simpleton::MiddlewareChains[Time.now] }.equals([])
+
+  asserts("that Simpleton::CommandRunners is autoloaded") { Simpleton::CommandRunners }
+  asserts("that Simpleton::Worker is autoloaded") { Simpleton::Worker }
 end
 
 context "Simpleton.configure" do
@@ -83,7 +85,7 @@ context %Q[When the hosts are ["app1", "app2", "app3"],] do
     should "not add an instance of the middleware to hosts not specified" do
       non_applicable_hosts = Simpleton::Configuration[:hosts] - @applicable_hosts
       non_applicable_hosts.all? do |host|
-        !Simpleton::MiddlewareChains[host].detect { |middleware| middleware.instance_of?(@middleware_class) }
+        !Array(Simpleton::MiddlewareChains[host]).detect { |middleware| middleware.instance_of?(@middleware_class) }
       end
     end
 
