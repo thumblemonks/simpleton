@@ -6,5 +6,8 @@ module Simpleton
       @host = host
       @middleware_chain = middleware_chain
     end
+
+    def run
+    end
   end
 end

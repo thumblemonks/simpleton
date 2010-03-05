@@ -1,4 +1,7 @@
 module Simpleton
+  autoload :CommandRunners, "simpleton/command_runners"
+  autoload :Worker, "simpleton/worker"
+
   Configuration = {}
   MiddlewareChains = {}
 
@@ -6,7 +9,7 @@ module Simpleton
     yield Configuration
   end
 
-  def self.use(middleware_class, opts={})
+  def self.use(middleware, opts={})
     specified_hosts = opts[:only]
     unless specified_hosts.nil? || (specified_hosts - configured_hosts).empty?
       raise ArgumentError, "Some of the specified hosts are not configured"
@@ -17,12 +20,17 @@ module Simpleton
 
     applicable_hosts.each do |host|
       MiddlewareChains[host] ||= []
-      MiddlewareChains[host] << middleware_class.new
+      MiddlewareChains[host] << middleware
     end
   end
 
-  autoload :CommandRunners, "simpleton/command_runners"
-  autoload :Worker, "simpleton/worker"
+  def self.run
+    MiddlewareChains.each do |host, chain|
+      fork { Worker.new(host, chain).run }
+    end
+
+    Process.waitall
+  end
 
 private
   def self.configured_hosts
