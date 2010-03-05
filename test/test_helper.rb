@@ -7,3 +7,7 @@ require 'simpleton'
 class Simpleton::CommandRunners::System
   def self.system(*args); true; end
 end
+
+unless ENV["VERBOSE"]
+  Riot.reporter = Riot::DotMatrixReporter
+end
