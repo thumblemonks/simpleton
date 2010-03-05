@@ -128,21 +128,55 @@ context "Simpleton.run" do
     Simpleton.run
   end
 
-  should "construct a Worker for the host in the child process appropriately" do
+  should "run each Worker constructed in the child process" do
     stub(Simpleton).fork { |block| block.call }
     Simpleton::MiddlewareChains.each do |host, chain|
-      mock.proxy(Simpleton::Worker).new(host, chain)
+      stub(Simpleton::Worker).new { mock!.run }
     end
 
     Simpleton.run
   end
 
-  should "run each Worker constructed in the child process" do
+  should "construct a new Worker in child process with the appropriate host" do
     stub(Simpleton).fork { |block| block.call }
     Simpleton::MiddlewareChains.each do |host, chain|
-      stub(Simpleton::Worker).new(host, chain) { mock!.run }
+      mock.proxy(Simpleton::Worker).new(host, anything, anything)
     end
 
     Simpleton.run
+  end
+
+  should "construct a new Worker in child process with the appropriate chain" do
+    stub(Simpleton).fork { |block| block.call }
+    Simpleton::MiddlewareChains.each do |host, chain|
+      mock.proxy(Simpleton::Worker).new(anything, chain, anything)
+    end
+
+    Simpleton.run
+  end
+
+  context "with no arguments" do
+    should "construct a new Worker in process with a Simpleton::CommandRunners::System as the command runner" do
+      stub(Simpleton).fork { |block| block.call }
+      Simpleton::MiddlewareChains.each do |host, chain|
+        mock.proxy(Simpleton::Worker).new(anything, anything, Simpleton::CommandRunners::System)
+      end
+
+      Simpleton.run
+    end
+  end
+
+  context "with an argument" do
+    should "construct a new Worker in process with the argument as the command runner" do
+      command_runner = Object.new
+      def command_runner.run(*args); true; end
+
+      stub(Simpleton).fork { |block| block.call }
+      Simpleton::MiddlewareChains.each do |host, chain|
+        mock.proxy(Simpleton::Worker).new(anything, anything, command_runner)
+      end
+
+      Simpleton.run(command_runner)
+    end
   end
 end

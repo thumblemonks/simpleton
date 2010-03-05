@@ -24,9 +24,9 @@ module Simpleton
     end
   end
 
-  def self.run
+  def self.run(command_runner = Simpleton::CommandRunners::System)
     MiddlewareChains.each do |host, chain|
-      fork { Worker.new(host, chain).run }
+      fork { Worker.new(host, chain, command_runner).run }
     end
 
     Process.waitall

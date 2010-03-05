@@ -5,7 +5,7 @@ context "Simpleton::Worker.new" do
   middleware_chain = [ Proc.new {"echo 123"} ]
 
   context "with arguments (#{host}, #{middleware_chain.inspect})" do
-    setup { Simpleton::Worker.new(host, middleware_chain) }
+    setup { Simpleton::Worker.new(host, middleware_chain, Simpleton::CommandRunners::System) }
 
     asserts(:host).equals(host)
     asserts(:middleware_chain).equals(middleware_chain)
@@ -25,7 +25,7 @@ context "Simpleton::Worker.new" do
 end
 
 context "Simpleton::Worker#run" do
-  setup { @worker = Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}]) }
+  setup { @worker = Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Simpleton::CommandRunners::System) }
 
   context "when all commands are successful" do
     should "run the command_runner with the host and result of middleware.call for each middleware in the chain" do
