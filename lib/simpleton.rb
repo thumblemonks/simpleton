@@ -1,5 +1,6 @@
 module Simpleton
   autoload :CommandRunners, "simpleton/command_runners"
+  autoload :Middleware, "simpleton/middleware"
   autoload :Worker, "simpleton/worker"
 
   Configuration = {}
