@@ -25,31 +25,41 @@ context "Simpleton::Worker.new" do
 end
 
 context "Simpleton::Worker#run" do
-  setup { @worker = Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Simpleton::CommandRunners::System) }
+  setup { Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Simpleton::CommandRunners::System) }
 
-  context "when all commands are successful" do
-    should "run the command_runner with the host and result of middleware.call for each middleware in the chain" do
-      topic.middleware_chain.each do |middleware|
-        mock(topic.command_runner).run(topic.host, middleware.call) {true}
-      end
-
-      topic.run
+  should "run every middleware through the command runner when there are no failures" do
+    topic.middleware_chain.each do |middleware|
+      mock(topic.command_runner).run(anything, middleware.call) {true}
     end
+
+    topic.run
   end
 
-  context "when not all commands are successful" do
-    should "only run commands up to and including the first failed command" do
-      mock(topic.command_runner).run(topic.host, topic.middleware_chain.first.call) {false}
-      mock(topic.command_runner).run(topic.host, topic.middleware_chain.last.call).never
+  should "stop running middleware through the command runner after the first failure" do
+    mock(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
+    mock(topic.command_runner).run(anything, topic.middleware_chain.last.call).never
 
-      @worker.run
-      true
+    topic.run
+    true
+  end
+
+  asserts "that its return value when running a middleware through the command runner fails" do
+    stub(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
+
+    topic.run
+  end.equals(false)
+
+  should "call each middleware with Simpleton::Configuration" do
+    topic.middleware_chain.each do |middleware|
+      mock(middleware).call(Simpleton::Configuration) {""}
     end
 
-    should "return false" do
-      stub(topic.command_runner).run(topic.host, topic.middleware_chain.first.call) {false}
+    topic.run
+  end
 
-      false == @worker.run
-    end
+  should "run its command runner with the Worker's host" do
+    mock(topic.command_runner).run(topic.host, anything).times(2) {true}
+
+    topic.run
   end
 end

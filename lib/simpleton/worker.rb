@@ -9,7 +9,9 @@ module Simpleton
     end
 
     def run
-      middleware_chain.all? { |middleware| command_runner.run(host, middleware.call) }
+      middleware_chain.all? do |middleware|
+        command_runner.run(host, middleware.call(Configuration))
+      end
     end
   end
 end
