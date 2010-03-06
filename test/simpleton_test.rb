@@ -34,7 +34,7 @@ end
     end
 
     context "Simpleton.use" do
-      asserts("that it") { Simpleton.use(Class.new) }.raises(ArgumentError, /would not apply/)
+      asserts("that it") { Simpleton.use(Class.new) }.raises(Simpleton::Error, /would not apply/)
     end
 
     teardown do
@@ -100,7 +100,7 @@ context %Q[When the hosts are ["app1", "app2", "app3"],] do
   context %Q[Simpleton.use(middleware, :only => ["not_configured"])] do
     asserts("that it") do
       Simpleton.use(@middleware, :only => ["not_configured"])
-    end.raises(ArgumentError, /some.*are not configured/i)
+    end.raises(Simpleton::Error, /some.*are not configured/i)
   end
 
   teardown do
