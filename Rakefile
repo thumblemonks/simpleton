@@ -14,12 +14,9 @@ begin
   require 'jeweler'
 
   Jeweler::Tasks.new do |gemspec|
-    gemspec.name = "simpleton"
-    gemspec.summary = "Simpleton makes deploying server apps simple."
-    gemspec.version = "0.1.0"
-    gemspec.homepage = "http://github.com/vandrijevik/simpleton"
+    gemspec.add_development_dependency "riot", "0.10.13"
+    gemspec.add_development_dependency "rr", "0.10.9"
     gemspec.authors = ["Vladimir Andrijevik"]
-    gemspec.email = "vladimir+simpleton@andrijevik.net"
     gemspec.description = <<-END_OF_DESCRIPTION.gsub(/^ */, "")
       Simpleton takes a simple, object-oriented approach to the way
       you deploy your server applications.
@@ -33,6 +30,11 @@ begin
       Simpleton ships with a few common Middleware, a couple of Command
       Runners, and makes it very easy to roll your own. Enjoy!
     END_OF_DESCRIPTION
+    gemspec.email = "vladimir+simpleton@andrijevik.net"
+    gemspec.homepage = "http://github.com/vandrijevik/simpleton"
+    gemspec.name = "simpleton"
+    gemspec.summary = "Simpleton makes deploying server apps simple."
+    gemspec.version = "0.1.1"
   end
 rescue LoadError
   warn "Jeweler not available."

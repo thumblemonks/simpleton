@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{simpleton}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Vladimir Andrijevik"]
@@ -31,6 +31,7 @@ Runners, and makes it very easy to roll your own. Enjoy!
      "lib/simpleton/middleware.rb",
      "lib/simpleton/middleware/git_bootstrapper.rb",
      "lib/simpleton/worker.rb",
+     "simpleton.gemspec",
      "test/command_runners/system_test.rb",
      "test/middleware/git_bootstrapper_test.rb",
      "test/simpleton_test.rb",
@@ -55,9 +56,15 @@ Runners, and makes it very easy to roll your own. Enjoy!
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+      s.add_development_dependency(%q<riot>, ["= 0.10.13"])
+      s.add_development_dependency(%q<rr>, ["= 0.10.9"])
     else
+      s.add_dependency(%q<riot>, ["= 0.10.13"])
+      s.add_dependency(%q<rr>, ["= 0.10.9"])
     end
   else
+    s.add_dependency(%q<riot>, ["= 0.10.13"])
+    s.add_dependency(%q<rr>, ["= 0.10.9"])
   end
 end
 
