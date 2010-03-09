@@ -3,9 +3,12 @@ require 'riot'
 require 'riot/rr'
 require 'simpleton'
 
-# Ensure that we don't call system commands for reals during the tests
-class Simpleton::CommandRunners::System
-  def self.system(*args); true; end
+module Kernel
+  # Ensure that we don't call system commands for reals in tests
+  def system(*args); true; end
+
+  # Ensure that we don't print messages to stdout for reals in tests
+  def puts(*args); true; end
 end
 
 unless ENV["VERBOSE"]
