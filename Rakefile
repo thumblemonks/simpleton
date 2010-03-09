@@ -34,7 +34,7 @@ begin
     gemspec.homepage = "http://github.com/vandrijevik/simpleton"
     gemspec.name = "simpleton"
     gemspec.summary = "Simpleton makes deploying server apps simple."
-    gemspec.version = "0.1.1"
+    gemspec.version = "0.2.0"
   end
 rescue LoadError
   warn "Jeweler not available."
