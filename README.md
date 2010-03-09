@@ -9,6 +9,10 @@ Simpleton is written in Ruby, and relies on existing UNIX command-line tools
 testable deployment scripts, and of proven tools that are available
 (almost) everywhere.
 
+## Installation
+
+    gem install simpleton
+
 ## Example
 
 Here's what a basic deployment script using Simpleton may look like:
@@ -75,6 +79,13 @@ Each worker runs in its own process, forked by the Simpleton framework, and
 is isolated from problems that may arise while running commands on the other
 hosts.
 
+## Dependencies
+
+* Runtime: `none`
+* Development
+  * `riot`
+  * `rr`
+
 ## Thanks
 
-* To Dan Hodos, for the project name.
+* __Dan Hodos__, for the project name.
