@@ -121,11 +121,12 @@ context "Simpleton.run" do
     Simpleton.run
   end
 
-  should "wait for all its children" do
+  should "wait for all its children and clear MiddlewareChains after they return" do
     stub(Simpleton).fork {true}
     mock.proxy(Process).waitall
 
     Simpleton.run
+    {} == Simpleton::MiddlewareChains
   end
 
   should "run each Worker constructed in the child process" do

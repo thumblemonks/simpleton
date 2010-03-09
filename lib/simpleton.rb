@@ -33,6 +33,7 @@ module Simpleton
     end
 
     Process.waitall
+    MiddlewareChains.clear
   end
 
 private
