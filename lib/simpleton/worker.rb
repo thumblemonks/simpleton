@@ -9,9 +9,11 @@ module Simpleton
     end
 
     def run
-      middleware_chain.all? do |middleware|
-        command_runner.run(host, middleware.call(Configuration))
-      end
+      commands = middleware_chain.map { |middleware| middleware.call(Configuration)}
+
+      commands.all? { |command| command_runner.run(host, command) }
+    rescue Simpleton::Error
+      false
     end
   end
 end

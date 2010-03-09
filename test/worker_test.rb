@@ -27,28 +27,6 @@ end
 context "Simpleton::Worker#run" do
   setup { Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Simpleton::CommandRunners::System) }
 
-  should "run every middleware through the command runner when there are no failures" do
-    topic.middleware_chain.each do |middleware|
-      mock(topic.command_runner).run(anything, middleware.call) {true}
-    end
-
-    topic.run
-  end
-
-  should "stop running middleware through the command runner after the first failure" do
-    mock(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
-    mock(topic.command_runner).run(anything, topic.middleware_chain.last.call).never
-
-    topic.run
-    true
-  end
-
-  asserts "that its return value when running a middleware through the command runner fails" do
-    stub(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
-
-    topic.run
-  end.equals(false)
-
   should "call each middleware with Simpleton::Configuration" do
     topic.middleware_chain.each do |middleware|
       mock(middleware).call(Simpleton::Configuration) {""}
@@ -57,9 +35,58 @@ context "Simpleton::Worker#run" do
     topic.run
   end
 
-  should "run its command runner with the Worker's host" do
+  should "supply its command runner with the Worker's host" do
     mock(topic.command_runner).run(topic.host, anything).times(2) {true}
 
     topic.run
+  end
+
+  context "when there are command failures" do
+    should "stop running commands after the first failure" do
+      mock(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
+      mock(topic.command_runner).run(anything, topic.middleware_chain.last.call).never
+
+      topic.run
+      true
+    end
+
+    asserts "that its return value" do
+      stub(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
+
+      topic.run
+    end.equals(false)
+  end
+
+  context "when some Middleware raise Simpleton::Error" do
+    should "handle the exception" do
+      stub(topic.middleware_chain.first).call {raise Simpleton::Error}
+
+      topic.run
+      true
+    end
+
+    should "not run any commands" do
+      stub(topic.middleware_chain.last).call {raise Simpleton::Error}
+      mock(topic.command_runner).run.never
+
+      topic.run
+      true
+    end
+
+    asserts "that its return value" do
+      stub(topic.middleware_chain.last).call {raise Simpleton::Error}
+
+      topic.run
+    end.equals(false)
+  end
+
+  context "without any command failures or Middleware exceptions" do
+    should "run the commands from every middleware in its chain" do
+      topic.middleware_chain.each do |middleware|
+        mock(topic.command_runner).run(anything, middleware.call) {true}
+      end
+
+      topic.run
+    end
   end
 end
