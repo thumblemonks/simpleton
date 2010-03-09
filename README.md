@@ -9,7 +9,22 @@ Simpleton is written in Ruby, and relies on existing UNIX command-line tools
 testable deployment scripts, and of proven tools that are available
 (almost) everywhere.
 
-## Basic Architecture
+## Example
+
+Here's what a basic deployment script using Simpleton may look like:
+
+    require 'simpleton'
+    
+    Simpleton.configure do |config|
+      config[:commit] = "origin/master"
+      config[:directory] = "/data/my_app"
+    end
+    
+    Simpleton.use Simpleton::Middleware::GitUpdater
+    Simpleton.use Proc.new {'echo "Finished at `date`. Enjoy!"'}
+    Simpleton.run
+
+## Architecture
 
 Simpleton is built on three basic ideas: *Middleware*, *Command Runners*,
 and *Workers*.
