@@ -58,26 +58,16 @@ context "Simpleton::Worker#run" do
   end
 
   context "when some Middleware raise Simpleton::Error" do
-    should "handle the exception" do
-      stub(topic.middleware_chain.first).call {raise Simpleton::Error}
-
-      topic.run
-      true
-    end
-
     should "not run any commands" do
       stub(topic.middleware_chain.last).call {raise Simpleton::Error}
       mock(topic.command_runner).run.never
 
-      topic.run
-      true
+      begin
+        topic.run
+      rescue Simpleton::Error
+        true
+      end
     end
-
-    asserts "that its return value" do
-      stub(topic.middleware_chain.last).call {raise Simpleton::Error}
-
-      topic.run
-    end.equals(false)
   end
 
   context "without any command failures or Middleware exceptions" do

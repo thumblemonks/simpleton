@@ -12,8 +12,6 @@ module Simpleton
       commands = middleware_chain.map { |middleware| middleware.call(Configuration)}
 
       commands.all? { |command| command_runner.run(host, command) }
-    rescue Simpleton::Error
-      false
     end
   end
 end
