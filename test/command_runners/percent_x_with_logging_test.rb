@@ -14,10 +14,9 @@ context "Simpleton::CommandRunners::PercentXWithLogging.run" do
   host = "host#{Time.now.to_i}"
   command = "echo 'Hello World'"
   should "display the host and command being run" do
-    stub(topic).puts
+    stub(Simpleton::CommandRunners::PercentX).run {true}
     mock(topic).puts("[#{host}]< #{command}")
     topic.run(host, command)
-    true
   end
 
   should %Q[call super] do
