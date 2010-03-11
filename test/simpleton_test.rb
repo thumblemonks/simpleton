@@ -157,10 +157,11 @@ context "Simpleton.run" do
   end
 
   context "with no arguments" do
-    should "construct a new Worker in process with a Simpleton::CommandRunners::System as the command runner" do
+    should "pass Simpleton::CommandRunners::PercentXWithLogging as the command runner to each Worker created" do
       stub(Simpleton).fork { |block| block.call }
+      stub(Simpleton::CommandRunners::PercentXWithLogging).run {true}
       Simpleton::MiddlewareChains.each do |host, chain|
-        mock.proxy(Simpleton::Worker).new(anything, anything, Simpleton::CommandRunners::System)
+        mock.proxy(Simpleton::Worker).new(anything, anything, Simpleton::CommandRunners::PercentXWithLogging)
       end
 
       Simpleton.run
