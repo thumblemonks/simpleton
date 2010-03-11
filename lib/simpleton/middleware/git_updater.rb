@@ -5,7 +5,7 @@ module Simpleton
         commit, directory = opts.values_at(:commit, :directory)
 
         unless commit && directory
-          raise Simpleton::Error, "GitBootstrapper requires the configuration parameters :commit and :directory"
+          raise Simpleton::Error, "GitUpdater requires the configuration parameters :commit and :directory"
         end
 
         "cd #{directory} && git fetch && git reset --hard #{commit}"
