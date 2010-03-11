@@ -8,7 +8,7 @@ module Kernel
   def system(*args); true; end
 
   # Ensure that we don't print messages to stdout for reals in tests
-  def puts(*args); true; end
+  def puts(*args); end
 end
 
 unless ENV["VERBOSE"]
