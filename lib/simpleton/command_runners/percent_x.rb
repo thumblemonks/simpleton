@@ -9,7 +9,7 @@ module Simpleton
 
     private
       def self.execute(cmd)
-        %x[cmd]
+        %x[#{cmd}]
       end
     end
   end

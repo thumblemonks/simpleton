@@ -14,7 +14,7 @@ context "Simpleton::CommandRunners::PercentXWithLogging.run" do
   host = "host#{Time.now.to_i}"
   command = "echo 'Hello World'"
   should "display the host and command being run" do
-    stub(Simpleton::CommandRunners::PercentX).run {true}
+    stub(Simpleton::CommandRunners::PercentX).run(host, command) {true}
     mock(topic).puts("[#{host}]< #{command}")
     topic.run(host, command)
   end
