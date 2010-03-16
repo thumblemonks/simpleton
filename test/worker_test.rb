@@ -1,5 +1,9 @@
 require 'test_helper'
 
+module Process
+  def self.exit(*args); true; end
+end
+
 context "Simpleton::Worker.new" do
   host = "foo"
   middleware_chain = [ Proc.new {"echo 123"} ]
@@ -50,11 +54,13 @@ context "Simpleton::Worker#run" do
       true
     end
 
-    asserts "that its return value" do
+    should "call Process.exit(1)" do
       stub(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
+      mock(Process).exit(1)
 
       topic.run
-    end.equals(false)
+      true
+    end
   end
 
   context "when some Middleware raise Simpleton::Error" do
@@ -77,6 +83,17 @@ context "Simpleton::Worker#run" do
       end
 
       topic.run
+    end
+
+    should "call Process.exit(0)" do
+      topic.middleware_chain.each do |middleware|
+        stub(topic.command_runner).run(anything, middleware.call) {true}
+      end
+
+      mock(Process).exit(0)
+
+      topic.run
+      true
     end
   end
 end

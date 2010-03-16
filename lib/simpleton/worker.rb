@@ -11,7 +11,11 @@ module Simpleton
     def run
       commands = middleware_chain.map { |middleware| middleware.call(Configuration)}
 
-      commands.all? { |command| command_runner.run(host, command) }
+      if commands.all? { |command| command_runner.run(host, command) }
+        Process.exit(0)
+      else
+        Process.exit(1)
+      end
     end
   end
 end
