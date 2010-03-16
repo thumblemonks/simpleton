@@ -27,7 +27,7 @@ module Simpleton
     end
   end
 
-  def self.run(command_runner = Simpleton::CommandRunners::PercentX)
+  def self.run(command_runner = Simpleton::CommandRunners::Open3)
     MiddlewareChains.each do |host, chain|
       fork { Worker.new(host, chain, command_runner).run }
     end
