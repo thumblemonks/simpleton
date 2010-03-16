@@ -156,6 +156,28 @@ context "Simpleton.run" do
     Simpleton.run
   end
 
+  should "return true when all its children exit successfully" do
+    stub(Simpleton).fork {true}
+    stub(Process).waitall do
+      [ [1, stub!.success? {true}.subject],
+        [2, stub!.success? {true}.subject] ]
+    end
+
+    Simpleton.run
+  end
+
+  should "call Process.exit(1) when some of its children exit unsuccessfully" do
+    stub(Simpleton).fork {true}
+    stub(Process).waitall do
+      [ [1, stub!.success? {false}.subject],
+        [2, stub!.success? {true}.subject] ]
+    end
+
+    mock(Process).exit(1) {true}
+
+    Simpleton.run
+  end
+
   context "with no arguments" do
     should "pass Simpleton::CommandRunners::PercentX as the command runner to each Worker created" do
       stub(Simpleton).fork { |block| block.call }

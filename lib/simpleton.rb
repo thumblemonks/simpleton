@@ -32,7 +32,8 @@ module Simpleton
       fork { Worker.new(host, chain, command_runner).run }
     end
 
-    Process.waitall
+    Process.waitall.all? { |pid, status| status.success? } ? true : Process.exit(1)
+  ensure
     MiddlewareChains.clear
   end
 
