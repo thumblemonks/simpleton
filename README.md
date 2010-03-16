@@ -25,7 +25,7 @@ Here's what a basic deployment script using Simpleton may look like:
     end
     
     Simpleton.use Simpleton::Middleware::GitUpdater
-    Simpleton.use Proc.new {'echo "Finished at `date`. Enjoy!"'}
+    Simpleton.use Proc.new {'echo "Finished at `date` on the server."'}
     Simpleton.run
 
 ## Architecture
@@ -55,14 +55,11 @@ will lookup the commit-id of the commit to deploy on a remote host.
 
 ### Command Runners
 
-A Command Runner is an object that responds to `run`, taking two string arguments
-representing a host to run the command on, and the command to be run. The default
-Command Runner is `Simpleton::CommandRunners::System`, whose `run` method is
-simply:
-
-    def self.run(host, command)
-      system("ssh", host, command)
-    end
+A Command Runner is an object that responds to `run`, taking two string arguments:
+a host to run the command on, and the command to be run. The default
+Command Runner is `Simpleton::CommandRunners::Open3`, which outputs each command
+that it runs, along with the resulting messages to standard output and standard
+error, if there are any.
 
 If you prefer another way of running commands on a remote host, check out the
 other Command Runners that ship with Simpleton, or simply write your own!
@@ -70,12 +67,11 @@ other Command Runners that ship with Simpleton, or simply write your own!
 ### Workers
 
 Workers are objects that perform the work for a single host in the
-configuration. Each `Simpleton::Worker`, given an array of Middleware objects
-and a Command Runner, constructs a list of commands by calling the Middleware
-objects and then runs the constructed commands in the list through the
-Command Runner.
+configuration. Given an array of Middleware objects and a Command Runner
+each `Simpleton::Worker` constructs a list of commands by calling the Middleware
+objects and then runs the list of constructed commands through the Command Runner.
 
-Each worker runs in its own process, forked by the Simpleton framework, and
+Each worker runs in its own process, forked by the Simpleton framework, so it
 is isolated from problems that may arise while running commands on the other
 hosts.
 
