@@ -49,6 +49,17 @@ context "Simpleton::CommandRunners::Open3.run" do
     topic.run(host, command)
   end
 
+  should "correctly handle multiple-line standard outputs" do
+    stub(topic).puts
+
+    stub(::Open3).popen3("ssh #{host} #{command}") do
+      [ StringIO.new, StringIO.new("hello\nworld\n"), StringIO.new ]
+    end
+    mock(topic).puts("[#{host}]> hello\n[#{host}]> world\n")
+
+    topic.run(host, command)
+  end
+
   should "display the error output of the command when present" do
     err_output = "Output #{Time.now.to_i}"
     stub(topic).puts
@@ -71,6 +82,18 @@ context "Simpleton::CommandRunners::Open3.run" do
     mock(topic).puts("[#{host}]E ").never
 
     topic.run(host, command)
+  end
+
+  should "correctly handle multiple-line error outputs" do
+    stub(topic).puts
+
+    stub(::Open3).popen3("ssh #{host} #{command}") do
+      [ StringIO.new, StringIO.new, StringIO.new("hello\nworld\n") ]
+    end
+    mock(topic).puts("[#{host}]E hello\n[#{host}]E world\n")
+
+    topic.run(host, command)
+    true
   end
 
   asserts "that when there was error output, its return value" do
