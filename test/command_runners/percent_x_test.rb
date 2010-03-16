@@ -7,13 +7,14 @@ context "Simpleton::CommandRunners::PercentX.run" do
   command = "echo 'Hello World'"
   mock_output = "Output #{Time.now.to_i}"
 
-  should "display the output of the command" do
-    stub(topic).execute("ssh #{host} #{command}") {mock_output}
+  should "display the command being run and its output" do
+    mock(topic).puts("[#{host}]< #{command}")
     mock(topic).puts("[#{host}]> #{mock_output}")
-    stub($?).success? {false}
+
+    stub(topic).execute("ssh #{host} #{command}") {mock_output}
+    stub($?).success? {true}
 
     topic.run(host, command)
-    true
   end
 
   asserts "that when the command fails, its return value" do

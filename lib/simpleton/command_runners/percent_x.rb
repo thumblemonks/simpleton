@@ -2,6 +2,7 @@ module Simpleton
   module CommandRunners
     class PercentX
       def self.run(host, command)
+        puts "[#{host}]< #{command}"
         output = execute("ssh #{host} #{command}")
         puts "[#{host}]> #{output}"
         $?.success?
