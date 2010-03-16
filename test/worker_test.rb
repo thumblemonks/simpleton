@@ -1,9 +1,5 @@
 require 'test_helper'
 
-module Process
-  def self.exit(*args); true; end
-end
-
 context "Simpleton::Worker.new" do
   host = "foo"
   middleware_chain = [ Proc.new {"echo 123"} ]
