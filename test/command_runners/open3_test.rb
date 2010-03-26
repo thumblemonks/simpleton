@@ -7,8 +7,8 @@ context "Simpleton::CommandRunners::Open3.run" do
   command = "echo 'Hello World'"
 
   context "with arguments (#{host}, #{command})" do
-    should %Q[call Open3.popen("ssh #{host} #{command}")] do
-      mock(::Open3).popen3("ssh #{host} #{command}") do
+    should %Q[call Open3.popen("ssh", "#{host}", "#{command}")] do
+      mock(::Open3).popen3("ssh", "#{host}", "#{command}") do
         [ StringIO.new, StringIO.new, StringIO.new ]
       end
       topic.run(host, command)
@@ -19,7 +19,7 @@ context "Simpleton::CommandRunners::Open3.run" do
     stub(topic).puts
     mock(topic).puts("[#{host}]< #{command}")
 
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new, StringIO.new ]
     end
 
@@ -30,7 +30,7 @@ context "Simpleton::CommandRunners::Open3.run" do
     std_output = "Output #{Time.now.to_i}"
     stub(topic).puts
 
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new(std_output), StringIO.new ]
     end
     mock(topic).puts("[#{host}]> #{std_output}")
@@ -41,7 +41,7 @@ context "Simpleton::CommandRunners::Open3.run" do
   should "not display the standard output of the command when there isn't any" do
     stub(topic).puts
 
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new, StringIO.new ]
     end
     mock(topic).puts("[#{host}]> ").never
@@ -52,7 +52,7 @@ context "Simpleton::CommandRunners::Open3.run" do
   should "correctly handle multiple-line standard outputs" do
     stub(topic).puts
 
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new("hello\nworld\n"), StringIO.new ]
     end
     mock(topic).puts("[#{host}]> hello\n[#{host}]> world\n")
@@ -64,7 +64,7 @@ context "Simpleton::CommandRunners::Open3.run" do
     err_output = "Output #{Time.now.to_i}"
     stub(topic).puts
 
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new, StringIO.new(err_output) ]
     end
     mock(topic).puts("[#{host}]E #{err_output}")
@@ -76,7 +76,7 @@ context "Simpleton::CommandRunners::Open3.run" do
   should "not display the error output of the command when there isn't any" do
     stub(topic).puts
 
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new, StringIO.new ]
     end
     mock(topic).puts("[#{host}]E ").never
@@ -87,7 +87,7 @@ context "Simpleton::CommandRunners::Open3.run" do
   should "correctly handle multiple-line error outputs" do
     stub(topic).puts
 
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new, StringIO.new("hello\nworld\n") ]
     end
     mock(topic).puts("[#{host}]E hello\n[#{host}]E world\n")
@@ -97,7 +97,7 @@ context "Simpleton::CommandRunners::Open3.run" do
   end
 
   asserts "that when there was error output, its return value" do
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new, StringIO.new("error") ]
     end
 
@@ -105,7 +105,7 @@ context "Simpleton::CommandRunners::Open3.run" do
   end.equals(false)
 
   asserts "that when there was no error output, its return value" do
-    stub(::Open3).popen3("ssh #{host} #{command}") do
+    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new, StringIO.new ]
     end
 

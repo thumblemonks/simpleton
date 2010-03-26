@@ -5,7 +5,7 @@ module Simpleton
     class Open3
       def self.run(host, command)
         puts "[#{host}]< #{command}"
-        i,o,e = ::Open3.popen3 "ssh #{host} #{command}"
+        i,o,e = ::Open3.popen3("ssh", host, command)
 
         unless (std_lines = o.readlines).empty?
           puts std_lines.map { |std_line| "[#{host}]> #{std_line}" }.join
