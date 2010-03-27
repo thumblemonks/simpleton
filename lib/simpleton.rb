@@ -13,11 +13,14 @@ module Simpleton
   end
 
   def self.use(middleware, opts={})
-    applicable_hosts = opts[:only] || Array(Configuration[:hosts])
+    applicable_locations = opts[:only] || Array(Configuration[:hosts])
+    unless (user = Configuration[:user]).nil?
+      applicable_locations = applicable_locations.map { |location| "#{user}@#{location}" }
+    end
 
-    applicable_hosts.each do |host|
-      MiddlewareChains[host] ||= []
-      MiddlewareChains[host] << middleware
+    applicable_locations.each do |location|
+      MiddlewareChains[location] ||= []
+      MiddlewareChains[location] << middleware
     end
   end
 

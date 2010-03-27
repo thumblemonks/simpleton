@@ -35,7 +35,7 @@ context "Simpleton.use(middleware)" do
   context "when the :only option is not specified" do
     setup { Simpleton.use @middleware }
 
-    should "add the middleware to every host's chain" do
+    should "add the middleware to every location's chain" do
       Simpleton::Configuration[:hosts].all? do |host|
         Simpleton::MiddlewareChains[host].detect { |middleware| middleware == @middleware }
       end
@@ -62,6 +62,19 @@ context "Simpleton.use(middleware)" do
     end
   end
 
+  context "when a user is explicitly set" do
+    setup do
+      Simpleton.configure { |config| config[:user] = "user#{Time.now.to_i}" }
+      Simpleton.use @middleware
+    end
+
+    should "include the user in the key for MiddlewareChains" do
+      Simpleton::Configuration[:hosts].all? do |host|
+        Simpleton::MiddlewareChains.key? "#{Simpleton::Configuration[:user]}@#{host}"
+      end
+    end
+  end
+
   teardown do
     Simpleton::Configuration.clear
     Simpleton::MiddlewareChains.clear
@@ -74,24 +87,24 @@ context "Simpleton.run" do
     Simpleton.use Proc.new {""}
   end
 
-  should "fork a new process for each configured host" do
-    mock(Simpleton).fork.times(Simpleton::Configuration[:hosts].length) { true }
-
+  should "fork a new process for each configured location" do
+    mock(Simpleton).fork.times(Simpleton::MiddlewareChains.keys.length) {true}
+  
     Simpleton.run
   end
-
-  should "construct a Worker for each host with the appropriate host and middleware chain" do
+  
+  should "construct a Worker for each location with the appropriate middleware chain" do
     stub(Simpleton).fork { |block| block.call }
-    Simpleton::MiddlewareChains.each do |host, chain|
-      mock.proxy(Simpleton::Worker).new(host, chain, anything)
+    Simpleton::MiddlewareChains.each do |location, chain|
+      mock.proxy(Simpleton::Worker).new(location, chain, anything)
     end
 
     Simpleton.run
   end
 
-  should "run each Worker constructed" do
+  should "run each constructed Worker" do
     stub(Simpleton).fork { |block| block.call }
-    Simpleton::MiddlewareChains.each do |host, chain|
+    Simpleton::MiddlewareChains.each do |location, chain|
       stub(Simpleton::Worker).new { mock!.run }
     end
 
@@ -130,7 +143,7 @@ context "Simpleton.run" do
   should "pass Simpleton::CommandRunners::Open3 as the command runner to each Worker created when called with no arguments" do
     stub(Simpleton).fork { |block| block.call }
     stub(Simpleton::CommandRunners::Open3).run {true}
-    Simpleton::MiddlewareChains.each do |host, chain|
+    Simpleton::MiddlewareChains.each do |location, chain|
       mock.proxy(Simpleton::Worker).new(anything, anything, Simpleton::CommandRunners::Open3)
     end
 
@@ -142,7 +155,7 @@ context "Simpleton.run" do
     def command_runner.run(*args); true; end
 
     stub(Simpleton).fork { |block| block.call }
-    Simpleton::MiddlewareChains.each do |host, chain|
+    Simpleton::MiddlewareChains.each do |location, chain|
       mock.proxy(Simpleton::Worker).new(anything, anything, command_runner)
     end
 

@@ -1,24 +1,14 @@
 require 'test_helper'
 
 context "Simpleton::Worker.new" do
-  host = "foo"
+  location = "user@host"
   middleware_chain = [ Proc.new {"echo 123"} ]
+  command_runner = Simpleton::CommandRunners::System
 
-  context "with arguments (#{host}, #{middleware_chain.inspect})" do
-    setup { Simpleton::Worker.new(host, middleware_chain, Simpleton::CommandRunners::System) }
+  context "with arguments (#{location}, #{middleware_chain.inspect}, #{command_runner})" do
+    setup { Simpleton::Worker.new(location, middleware_chain, command_runner) }
 
-    asserts(:host).equals(host)
-    asserts(:middleware_chain).equals(middleware_chain)
-    asserts(:command_runner).equals(Simpleton::CommandRunners::System)
-  end
-
-  command_runner = Object.new
-  def command_runner.run; end
-
-  context "with arguments (#{host}, #{middleware_chain.inspect}, #{command_runner})" do
-    setup { Simpleton::Worker.new(host, middleware_chain, command_runner) }
-
-    asserts(:host).equals(host)
+    asserts(:location).equals(location)
     asserts(:middleware_chain).equals(middleware_chain)
     asserts(:command_runner).equals(command_runner)
   end
@@ -35,8 +25,8 @@ context "Simpleton::Worker#run" do
     topic.run
   end
 
-  should "supply its command runner with the Worker's host" do
-    mock(topic.command_runner).run(topic.host, anything).times(2) {true}
+  should "supply its command runner with the Worker's location" do
+    mock(topic.command_runner).run(topic.location, anything).times(2) {true}
 
     topic.run
   end
