@@ -27,7 +27,5 @@ module Simpleton
     end
 
     Process.waitall.all? { |pid, status| status.success? } ? true : Process.exit(1)
-  ensure
-    MiddlewareChains.clear
   end
 end

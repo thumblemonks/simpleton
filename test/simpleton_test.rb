@@ -14,18 +14,16 @@ context "Simpleton" do
 end
 
 context "Simpleton.configure" do
-  context "with a block with single argument" do
-    desired_configuration = { :foo => "bar", :hello => "world" }
-    setup do
-      Simpleton.configure { |config| config.merge!(desired_configuration) }
-    end
-
-    should("set Simpleton::Configuration appropriately") do
-      Simpleton::Configuration
-    end.equals(desired_configuration)
-
-    teardown { Simpleton::Configuration.clear }
+  desired_configuration = { :foo => "bar", :hello => "world" }
+  setup do
+    Simpleton.configure { |config| config.merge!(desired_configuration) }
   end
+
+  should("set Simpleton::Configuration appropriately") do
+    Simpleton::Configuration
+  end.equals(desired_configuration)
+
+  teardown { Simpleton::Configuration.clear }
 end
 
 context "Simpleton.use(middleware)" do
@@ -73,17 +71,16 @@ end
 context "Simpleton.run" do
   setup do
     Simpleton.configure { |config| config[:hosts] = ["app1", "app2", "app3"] }
+    Simpleton.use Proc.new {""}
   end
 
   should "fork a new process for each configured host" do
-    Simpleton.use Proc.new {""}
     mock(Simpleton).fork.times(Simpleton::Configuration[:hosts].length) { true }
 
     Simpleton.run
   end
 
   should "construct a Worker for each host with the appropriate host and middleware chain" do
-    Simpleton.use Proc.new {""}
     stub(Simpleton).fork { |block| block.call }
     Simpleton::MiddlewareChains.each do |host, chain|
       mock.proxy(Simpleton::Worker).new(host, chain, anything)
@@ -93,7 +90,6 @@ context "Simpleton.run" do
   end
 
   should "run each Worker constructed" do
-    Simpleton.use Proc.new {""}
     stub(Simpleton).fork { |block| block.call }
     Simpleton::MiddlewareChains.each do |host, chain|
       stub(Simpleton::Worker).new { mock!.run }
@@ -102,12 +98,11 @@ context "Simpleton.run" do
     Simpleton.run
   end
 
-  should "wait for all its children and clear MiddlewareChains after they return" do
+  should "wait for all its children to return" do
     stub(Simpleton).fork {true}
     mock.proxy(Process).waitall
 
     Simpleton.run
-    {} == Simpleton::MiddlewareChains
   end
 
   should "return true when all its children exit successfully" do
@@ -133,7 +128,6 @@ context "Simpleton.run" do
   end
 
   should "pass Simpleton::CommandRunners::Open3 as the command runner to each Worker created when called with no arguments" do
-    Simpleton.use Proc.new {""}
     stub(Simpleton).fork { |block| block.call }
     stub(Simpleton::CommandRunners::Open3).run {true}
     Simpleton::MiddlewareChains.each do |host, chain|
@@ -144,7 +138,6 @@ context "Simpleton.run" do
   end
 
   should "pass its argument as the command runner to each Worker created" do
-    Simpleton.use Proc.new {""}
     command_runner = Object.new
     def command_runner.run(*args); true; end
 
@@ -154,5 +147,10 @@ context "Simpleton.run" do
     end
 
     Simpleton.run(command_runner)
+  end
+
+  teardown do
+    Simpleton::Configuration.clear
+    Simpleton::MiddlewareChains.clear
   end
 end
