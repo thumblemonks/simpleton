@@ -13,13 +13,7 @@ module Simpleton
   end
 
   def self.use(middleware, opts={})
-    specified_hosts = opts[:only]
-    unless specified_hosts.nil? || (specified_hosts - configured_hosts).empty?
-      raise Error, "Some of the specified hosts are not configured"
-    end
-
-    applicable_hosts = specified_hosts || configured_hosts
-    raise Error, "This middleware would not apply to any configured hosts" if applicable_hosts.empty?
+    applicable_hosts = opts[:only] || Array(Configuration[:hosts])
 
     applicable_hosts.each do |host|
       MiddlewareChains[host] ||= []
@@ -35,10 +29,5 @@ module Simpleton
     Process.waitall.all? { |pid, status| status.success? } ? true : Process.exit(1)
   ensure
     MiddlewareChains.clear
-  end
-
-private
-  def self.configured_hosts
-    Array(Configuration[:hosts])
   end
 end
