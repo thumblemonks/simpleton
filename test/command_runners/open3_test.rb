@@ -96,17 +96,9 @@ context "Simpleton::CommandRunners::Open3.run" do
     true
   end
 
-  asserts "that when there was error output, its return value" do
+  asserts "that its return value" do
     stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
-      [ StringIO.new, StringIO.new, StringIO.new("error") ]
-    end
-
-    topic.run(host, command)
-  end.equals(false)
-
-  asserts "that when there was no error output, its return value" do
-    stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
-      [ StringIO.new, StringIO.new, StringIO.new ]
+      [ StringIO.new, StringIO.new("output"), StringIO.new("error") ]
     end
 
     topic.run(host, command)

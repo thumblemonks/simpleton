@@ -15,7 +15,7 @@ module Simpleton
           puts err_lines.map { |error_line| "[#{host}]E #{error_line}" }.join
         end
 
-        err_lines.empty? ? true : false
+        true
       end
     end
   end
