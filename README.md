@@ -15,20 +15,33 @@ testable deployment scripts, and of proven tools that are available
 
 ## Example
 
-Here's what a basic deployment script using Simpleton may look like:
+Here's what a basic deployment script using Simpleton can look like:
 
     require 'simpleton'
     
     Simpleton.configure do |config|
+      config[:hosts] = ["host1", "host2"]
+      config[:repository] = "git://github.com/fantastic/awesome.git"
       config[:commit] = "origin/master"
-      config[:directory] = "/data/my_app"
+      config[:directory] = "/data/awesome"
     end
     
     Simpleton.use Simpleton::Middleware::GitUpdater
     Simpleton.use Proc.new {'echo "Finished at `date` on the server."'}
     Simpleton.run
 
-## Architecture
+The output you'd get would look something like this:
+
+    [host1]< cd /data/awesome && git fetch && git reset --hard origin/master
+    [host2]< cd /data/awesome && git fetch && git reset --hard origin/master
+    [host1]> HEAD is now at 123abcs This is the best commit ever.
+    [host1]< echo "Finished at `date` on the server."
+    [host2]> HEAD is now at 123abcs This is the best commit ever.
+    [host2]< echo "Finished at `date` on the server."
+    [host1]> Finished at Wed Mar  31 04:31:51 UTC 2010 on the server.
+    [host2]> Finished at Wed Mar  31 04:31:51 UTC 2010 on the server.
+
+## Design
 
 Simpleton is built on three basic ideas: *Middleware*, *Command Runners*,
 and *Workers*.
@@ -47,7 +60,7 @@ is run, it will echo the current time on a remote host, and:
 
     class Something
       def self.call(configuration)
-        %Q[git rev-parse #{configuration[:commit]}]
+        "git rev-parse #{configuration[:commit]}"
       end
     end
 
@@ -56,13 +69,17 @@ will lookup the commit-id of the commit to deploy on a remote host.
 ### Command Runners
 
 A Command Runner is an object that responds to `run`, taking two string arguments:
-a host to run the command on, and the command to be run. The default
-Command Runner is `Simpleton::CommandRunners::Open3`, which outputs each command
-that it runs, along with the resulting messages to standard output and standard
-error, if there are any.
+a location to run the command at, and the command to be run. The location is in
+the standard SSH `[user@]hostname` format, so it can be just a host to run the
+command and optionally include a specific user to run the command as.
+
+The default Command Runner is `Simpleton::CommandRunners::Open3`, which displays
+each command that it runs, along with the results of its standard output and
+standard error streams.
 
 If you prefer another way of running commands on a remote host, check out the
-other Command Runners that ship with Simpleton, or simply write your own!
+other Command Runner that ship with Simpleton (System), write your own.
+It's simple!
 
 ### Workers
 
