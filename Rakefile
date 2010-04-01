@@ -18,23 +18,20 @@ begin
     gemspec.add_development_dependency "rr", "0.10.9"
     gemspec.authors = ["Vladimir Andrijevik"]
     gemspec.description = <<-END_OF_DESCRIPTION.gsub(/^ */, "")
-      Simpleton takes a simple, object-oriented approach to the way
-      you deploy your server applications.
-      
-      With Simpleton, you express (and test) the things that need to
-      happen during a deployment as Middleware objects. A Command Runner
-      runs the command from a Middleware on a remote host, and
-      Simpleton orchestrates the operation of Command Runners on the
-      hosts you've configured.
-      
-      Simpleton ships with a few common Middleware, a couple of Command
-      Runners, and makes it very easy to roll your own. Enjoy!
+      Simpleton is a deployment micro-framework which aims to simplify and improve
+      the deployment of web applications. In this regard, it is in the same space
+      as Capistrano, Vlad the Deployer, and other similar tools.
+
+      Simpleton is written in Ruby, and relies on existing UNIX command-line tools
+      (`ssh`, `git`, etc.) to bring out the best of both worlds: a powerful DSL with
+      testable deployment scripts, and of proven tools that are available
+      (almost) everywhere.
     END_OF_DESCRIPTION
     gemspec.email = "vladimir+simpleton@andrijevik.net"
     gemspec.homepage = "http://github.com/vandrijevik/simpleton"
     gemspec.name = "simpleton"
     gemspec.summary = "Simpleton makes deploying server apps simple."
-    gemspec.version = "0.2.0"
+    gemspec.version = "0.3.0"
   end
 rescue LoadError
   warn "Jeweler not available."
