@@ -8,6 +8,7 @@ context "Simpleton::CommandRunners::Open3.run" do
 
   context "with arguments (#{host}, #{command})" do
     should %Q[call Open3.popen("ssh", "#{host}", "#{command}")] do
+      stub(topic).puts
       mock(::Open3).popen3("ssh", "#{host}", "#{command}") do
         [ StringIO.new, StringIO.new, StringIO.new ]
       end
@@ -97,6 +98,7 @@ context "Simpleton::CommandRunners::Open3.run" do
   end
 
   asserts "that its return value" do
+    stub(topic).puts
     stub(::Open3).popen3("ssh", "#{host}", "#{command}") do
       [ StringIO.new, StringIO.new("output"), StringIO.new("error") ]
     end

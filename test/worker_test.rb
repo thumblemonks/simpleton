@@ -15,9 +15,12 @@ context "Simpleton::Worker.new" do
 end
 
 context "Simpleton::Worker#run" do
-  setup { Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Simpleton::CommandRunners::System) }
+  setup { Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Object.new) }
 
   should "call each middleware with Simpleton::Configuration" do
+    stub(topic.command_runner).run {true}
+    stub(Process).exit {true}
+
     topic.middleware_chain.each do |middleware|
       mock(middleware).call(Simpleton::Configuration) {""}
     end
@@ -26,6 +29,8 @@ context "Simpleton::Worker#run" do
   end
 
   should "supply its command runner with the Worker's location" do
+    stub(Process).exit {true}
+
     mock(topic.command_runner).run(topic.location, anything).times(2) {true}
 
     topic.run
@@ -33,6 +38,8 @@ context "Simpleton::Worker#run" do
 
   context "when there are command failures" do
     should "stop running commands after the first failure" do
+      stub(Process).exit {true}
+
       mock(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
       mock(topic.command_runner).run(anything, topic.middleware_chain.last.call).never
 
@@ -42,6 +49,7 @@ context "Simpleton::Worker#run" do
 
     should "call Process.exit(1)" do
       stub(topic.command_runner).run(anything, topic.middleware_chain.first.call) {false}
+
       mock(Process).exit(1)
 
       topic.run
@@ -52,6 +60,8 @@ context "Simpleton::Worker#run" do
   context "when some Middleware raise Simpleton::Error" do
     should "not run any commands" do
       stub(topic.middleware_chain.last).call {raise Simpleton::Error}
+      stub(Process).exit {true}
+
       mock(topic.command_runner).run.never
 
       begin
@@ -64,6 +74,8 @@ context "Simpleton::Worker#run" do
 
   context "without any command failures or Middleware exceptions" do
     should "run the commands from every middleware in its chain" do
+      stub(Process).exit {true}
+
       topic.middleware_chain.each do |middleware|
         mock(topic.command_runner).run(anything, middleware.call) {true}
       end
@@ -76,10 +88,9 @@ context "Simpleton::Worker#run" do
         stub(topic.command_runner).run(anything, middleware.call) {true}
       end
 
-      mock(Process).exit(0)
+      mock(Process).exit(0) {true}
 
       topic.run
-      true
     end
   end
 end

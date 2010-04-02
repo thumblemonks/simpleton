@@ -96,7 +96,7 @@ context "Simpleton.run" do
   should "construct a Worker for each location with the appropriate middleware chain" do
     stub(Simpleton).fork { |block| block.call }
     Simpleton::MiddlewareChains.each do |location, chain|
-      mock.proxy(Simpleton::Worker).new(location, chain, anything)
+      mock(Simpleton::Worker).new(location, chain, anything) { mock!.run }
     end
 
     Simpleton.run
