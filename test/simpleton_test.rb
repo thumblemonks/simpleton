@@ -8,5 +8,6 @@ context "Simpleton" do
 
   asserts("that Simpleton::CommandRunner is autoloaded") { Simpleton::CommandRunner }
   asserts("that Simpleton::Master is autoloaded") { Simpleton::Master }
+  asserts("that Simpleton::Master is autoloaded") { Simpleton::Middleware }
   asserts("that Simpleton::Worker is autoloaded") { Simpleton::Worker }
 end
