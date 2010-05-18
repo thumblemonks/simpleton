@@ -4,25 +4,28 @@ context "Simpleton::Worker.new" do
   location = "user@host"
   middleware_chain = [ Proc.new {"echo 123"} ]
   command_runner = Simpleton::CommandRunner
+  configuration = { :a => :b}
 
-  context "with arguments (#{location}, #{middleware_chain.inspect}, #{command_runner})" do
-    setup { Simpleton::Worker.new(location, middleware_chain, command_runner) }
+  context "with arguments (#{location}, #{middleware_chain.inspect}, #{command_runner}, #{configuration})" do
+    setup { Simpleton::Worker.new(location, middleware_chain, command_runner, configuration) }
 
     asserts(:location).equals(location)
     asserts(:middleware_chain).equals(middleware_chain)
     asserts(:command_runner).equals(command_runner)
+    asserts(:configuration).equals(configuration)
   end
 end
 
 context "Simpleton::Worker#run" do
-  setup { Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Object.new) }
+  configuration = { :a => :b }
+  setup { Simpleton::Worker.new("app1", [Proc.new {"a"}, Proc.new {"b"}], Object.new, configuration) }
 
-  should "call each middleware with Simpleton::Configuration" do
+  should "call each middleware with its configuration" do
     stub(topic.command_runner).run {true}
     stub(Process).exit {true}
 
     topic.middleware_chain.each do |middleware|
-      mock(middleware).call(Simpleton::Configuration) {""}
+      mock(middleware).call(configuration) {""}
     end
 
     topic.run
