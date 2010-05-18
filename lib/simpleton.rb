@@ -1,7 +1,7 @@
 module Simpleton
   class Error < ::RuntimeError; end
 
-  autoload :CommandRunners, "simpleton/command_runners"
+  autoload :CommandRunner, "simpleton/command_runner"
   autoload :Middleware, "simpleton/middleware"
   autoload :Worker, "simpleton/worker"
 
@@ -24,7 +24,7 @@ module Simpleton
     end
   end
 
-  def self.run(command_runner = Simpleton::CommandRunners::Open3)
+  def self.run(command_runner = Simpleton::CommandRunner)
     MiddlewareChains.each do |host, chain|
       fork { Worker.new(host, chain, command_runner).run }
     end

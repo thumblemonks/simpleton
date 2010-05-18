@@ -9,7 +9,7 @@ context "Simpleton" do
   asserts("that Simpleton::Configuration") { Simpleton::Configuration }.kind_of(Hash)
   asserts("that Simpleton::MiddlewareChains") { Simpleton::MiddlewareChains }.kind_of(Hash)
 
-  asserts("that Simpleton::CommandRunners is autoloaded") { Simpleton::CommandRunners }
+  asserts("that Simpleton::CommandRunner is autoloaded") { Simpleton::CommandRunner }
   asserts("that Simpleton::Worker is autoloaded") { Simpleton::Worker }
 end
 
@@ -140,11 +140,11 @@ context "Simpleton.run" do
     Simpleton.run
   end
 
-  should "pass Simpleton::CommandRunners::Open3 as the command runner to each Worker created when called with no arguments" do
+  should "pass Simpleton::CommandRunner as the command runner to each Worker created when called with no arguments" do
     stub(Simpleton).fork { |block| block.call }
-    stub(Simpleton::CommandRunners::Open3).run {true}
+    stub(Simpleton::CommandRunner).run {true}
     Simpleton::MiddlewareChains.each do |location, chain|
-      mock.proxy(Simpleton::Worker).new(anything, anything, Simpleton::CommandRunners::Open3)
+      mock.proxy(Simpleton::Worker).new(anything, anything, Simpleton::CommandRunner)
     end
 
     Simpleton.run

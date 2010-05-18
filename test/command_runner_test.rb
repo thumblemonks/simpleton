@@ -1,7 +1,7 @@
 require 'test_helper'
 
-context "Simpleton::CommandRunners::Open3.run" do
-  setup { Simpleton::CommandRunners::Open3 }
+context "Simpleton::CommandRunner.run" do
+  setup { Simpleton::CommandRunner }
 
   host = "host#{Time.now.to_i}"
   command = "echo 'Hello World'"

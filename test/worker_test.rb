@@ -3,7 +3,7 @@ require 'test_helper'
 context "Simpleton::Worker.new" do
   location = "user@host"
   middleware_chain = [ Proc.new {"echo 123"} ]
-  command_runner = Simpleton::CommandRunners::System
+  command_runner = Simpleton::CommandRunner
 
   context "with arguments (#{location}, #{middleware_chain.inspect}, #{command_runner})" do
     setup { Simpleton::Worker.new(location, middleware_chain, command_runner) }
