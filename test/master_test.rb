@@ -63,7 +63,7 @@ context "Simpleton::Master#use(middleware)" do
   end
 end
 
-context "@master::Master#run" do
+context "Simpleton::Master#run" do
   setup do
     @master = Simpleton::Master.new
     @master.configure { |config| config[:hosts] = ["app1", "app2", "app3"] }
@@ -79,7 +79,7 @@ context "@master::Master#run" do
   should "construct a Worker for each location with the appropriate middleware chain" do
     stub(@master).fork { |block| block.call }
     @master.middleware_chains.each do |location, chain|
-      mock(Simpleton::Worker).new(location, chain, anything, anything) { mock!.run }
+      mock(Simpleton::Worker).new(location, chain, anything) { mock!.run }
     end
 
     @master.run
@@ -121,27 +121,5 @@ context "@master::Master#run" do
     mock(Process).exit(1) {true}
 
     @master.run
-  end
-
-  should "pass Simpleton::CommandRunner as the command runner to each Worker created when called with no arguments" do
-    stub(@master).fork { |block| block.call }
-    stub(Simpleton::CommandRunner).run {true}
-    @master.middleware_chains.each do |location, chain|
-      mock.proxy(Simpleton::Worker).new(anything, anything, Simpleton::CommandRunner, anything)
-    end
-
-    @master.run
-  end
-
-  should "pass its argument as the command runner to each Worker created" do
-    command_runner = Object.new
-    def command_runner.run(*args); true; end
-
-    stub(@master).fork { |block| block.call }
-    @master.middleware_chains.each do |location, chain|
-      mock.proxy(Simpleton::Worker).new(anything, anything, command_runner, anything)
-    end
-
-    @master.run(command_runner)
   end
 end

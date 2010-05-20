@@ -6,7 +6,6 @@ context "Simpleton" do
   asserts_topic.responds_to :use
   asserts_topic.responds_to :run
 
-  asserts("that Simpleton::CommandRunner is autoloaded") { Simpleton::CommandRunner }
   asserts("that Simpleton::Master is autoloaded") { Simpleton::Master }
   asserts("that Simpleton::Master is autoloaded") { Simpleton::Middleware }
   asserts("that Simpleton::Worker is autoloaded") { Simpleton::Worker }

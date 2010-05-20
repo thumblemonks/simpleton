@@ -23,6 +23,8 @@ Gem::Specification.new do |s|
   s.files     += Dir.glob("lib/**/*")
   s.test_files = Dir.glob("test/**/*")
 
+  s.add_dependency "session", "2.4.0"
+
   s.add_development_dependency "riot"
   s.add_development_dependency "rr"
 end

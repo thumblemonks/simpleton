@@ -23,9 +23,9 @@ module Simpleton
       end
     end
 
-    def run(command_runner = Simpleton::CommandRunner)
+    def run(worker_class = Simpleton::Worker)
       middleware_chains.each do |location, chain|
-        fork { Worker.new(location, chain, command_runner, configuration).run }
+        fork { worker_class.new(location, chain, configuration).run }
       end
 
       Process.waitall.all? { |pid, status| status.success? } ? true : Process.exit(1)
