@@ -19,7 +19,7 @@ module Simpleton
         stdout, stderr = execute(shell, location, command)
         log_output(stdout, stderr)
 
-        Process.exit(sh.exit_status) unless sh.exit_status.zero?
+        Process.exit(shell.exit_status) unless shell.exit_status.zero?
       end
     end
 
