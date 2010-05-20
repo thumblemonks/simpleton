@@ -1,10 +1,10 @@
 module Simpleton
   class Master
-    attr_accessor :configuration, :middleware_chains
+    attr_accessor :configuration, :middleware_queues
 
     def initialize
       @configuration = {}
-      @middleware_chains = {}
+      @middleware_queues = {}
     end
 
     def configure
@@ -18,13 +18,13 @@ module Simpleton
       end
 
       applicable_locations.each do |location|
-        middleware_chains[location] ||= []
-        middleware_chains[location] << middleware
+        middleware_queues[location] ||= []
+        middleware_queues[location] << middleware
       end
     end
 
     def run(worker_class = Simpleton::Worker)
-      middleware_chains.each do |location, chain|
+      middleware_queues.each do |location, chain|
         fork { worker_class.new(location, chain, configuration).run }
       end
 

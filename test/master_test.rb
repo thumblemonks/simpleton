@@ -24,7 +24,7 @@ context "Simpleton::Master#use(middleware)" do
 
     should "add the middleware to every location's chain" do
       @master.configuration[:hosts].all? do |host|
-        @master.middleware_chains[host].detect { |middleware| middleware == @middleware }
+        @master.middleware_queues[host].detect { |middleware| middleware == @middleware }
       end
     end
   end
@@ -37,14 +37,14 @@ context "Simpleton::Master#use(middleware)" do
 
     should "add the middleware to the hosts specified by :only" do
       @applicable_hosts.all? do |host|
-        @master.middleware_chains[host].detect { |middleware| middleware == @middleware }
+        @master.middleware_queues[host].detect { |middleware| middleware == @middleware }
       end
     end
 
     should "not add the middleware to hosts that are not specified by :only" do
       non_applicable_hosts = @master.configuration[:hosts] - @applicable_hosts
       non_applicable_hosts.all? do |host|
-        !Array(@master.middleware_chains[host]).detect { |middleware| middleware == @middleware }
+        !Array(@master.middleware_queues[host]).detect { |middleware| middleware == @middleware }
       end
     end
   end
@@ -57,7 +57,7 @@ context "Simpleton::Master#use(middleware)" do
 
     should "include the user in the key for MiddlewareChains" do
       @master.configuration[:hosts].all? do |host|
-        @master.middleware_chains.key? "#{@master.configuration[:user]}@#{host}"
+        @master.middleware_queues.key? "#{@master.configuration[:user]}@#{host}"
       end
     end
   end
@@ -71,14 +71,14 @@ context "Simpleton::Master#run" do
   end
 
   should "fork a new process for each configured location" do
-    mock(@master).fork.times(@master.middleware_chains.keys.length) {true}
+    mock(@master).fork.times(@master.middleware_queues.keys.length) {true}
   
     @master.run
   end
   
   should "construct a Worker for each location with the appropriate middleware chain" do
     stub(@master).fork { |block| block.call }
-    @master.middleware_chains.each do |location, chain|
+    @master.middleware_queues.each do |location, chain|
       mock(Simpleton::Worker).new(location, chain, anything) { mock!.run }
     end
 
@@ -87,7 +87,7 @@ context "Simpleton::Master#run" do
 
   should "run each constructed Worker" do
     stub(@master).fork { |block| block.call }
-    @master.middleware_chains.each do |location, chain|
+    @master.middleware_queues.each do |location, chain|
       stub(Simpleton::Worker).new { mock!.run }
     end
 
